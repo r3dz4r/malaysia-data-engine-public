@@ -10,8 +10,6 @@ The **scraping code, internal configs, and business strategy** live in the
 
 - [`openwiki/`](./openwiki/index.md) — auto-generated knowledge graph of the
   data ingestion pipeline, written by [openwiki](https://github.com/langchain-ai/openwiki)
-- Schema definitions for the data model
-- Public-facing methodology notes
 
 ## What this isn't
 
