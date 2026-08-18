@@ -1,0 +1,113 @@
+# Malaysia Public Data Intelligence Engine
+
+> A reusable, vertical-first pipeline that harvests Malaysian public-sector
+> datasets, normalises each into a source-specific JSON Schema, and stores
+> both raw payloads and normalised rows in PostgreSQL for downstream
+> curation and licensed resale. The first operational vertical is the NPRA
+> pharmaceutical compliance pipeline (5 categories, ~31k records refreshed
+> daily); subsequent verticals — ePerolehan government procurement, JPPH
+> NAPIC property transactions, SSM company registry — share the same
+> scraping-agnostic scaffolding.
+>
+> This repository is **scaffold + operational first-product**. Procurement,
+> JPPH, and SSM scrapers are pending. The NPRA pharma pipeline is the
+> live, daily-refreshed reference implementation.
+
+The engine is built around a single generic `entity_record` table with a
+JSONB `normalized` payload validated against per-vertical JSON Schemas. PDPA
+2010 (as amended 2024) governs only "personal data"; anonymised business
+registries, transactional data, and aggregated statistics are outside PDPA
+and freely monetisable. Operational guardrails (never publish natural-person
+identifiers, generic role titles only, manual review on high PDPA risk)
+are enforced at the scraper boundary.
+
+This index is forward-compatible agent infrastructure. It does not imply
+adoption by any LLM provider, improved citations, or guaranteed uptime of
+the public endpoint. Use the catalogue as a discovery surface; verify
+against the canonical source-of-truth before relying on any record.
+
+## Catalogue at a glance
+
+- **Sources registered:** 10 (see `sources.yaml` for canonical list)
+- **Verticals supported:** 5 (procurement, property, company registry, future POI, future Malay speech corpus)
+- **Verticals operational:** 1 (NPRA pharmaceutical compliance)
+- **Records currently ingested:** 31,569 (NPRA pharma, all 5 categories)
+- **Refresh cadence:** NPRA pharma daily; other verticals on activation
+- **Public artefacts:** PostgreSQL exports (manual), per-source JSON contracts (`schemas/`), `health.json` for the NPRA pipeline
+
+### Source mix (10 sources)
+
+| Source | Vertical | Refresh | PDPA risk |
+|---|---|---|---|
+| ePerolehan (MOF) | Procurement | daily | low |
+| JPPH NAPIC e-Data | Property transactions | monthly | low |
+| SSM e-Info | Company registry | ad hoc | low |
+| data.gov.my | Cross-vertical open data | daily | varies |
+| BNM Open API | Exchange rates, rates, reserves | daily | low |
+| OpenDOSM | Economic statistics | varies | low |
+| KKMNOW | Health data | varies | varies |
+| LHDN MyInvois | E-invoicing schema | ad hoc | low |
+| MetMalaysia | Weather | varies | low |
+| BNM publications | Reports, statistics | varies | low |
+
+## Model Context Protocol (MCP)
+
+**Status: planned, not yet shipped.** The engine's MCP server is a future
+deliverable. When shipped, it will be:
+
+- **Read-only** — agents query the catalogue; nothing is written upstream
+- **Public, no auth required** — same posture as datapulse-my's MCP endpoint
+- **Streamable HTTP transport** — POST-only, single endpoint
+
+Until the MCP server ships, agents can:
+
+1. Fetch this `llms.txt` for the catalogue summary
+2. Fetch `https://raw.githubusercontent.com/r3dz4r/malaysia-data-engine-public/main/sources.yaml` for the canonical source list (mirrored from the private engine repo)
+3. Fetch `https://raw.githubusercontent.com/r3dz4r/malaysia-data-engine-public/main/schemas/<vertical>.yaml` for any specific vertical's JSON contract (mirrored where source-code-safe)
+4. Fetch `https://raw.githubusercontent.com/r3dz4r/malaysia-data-engine-public/main/data/pharma/health.json` for the NPRA pipeline health snapshot (mirrored as a slim summary; full health.json lives in the private repo)
+
+## Agent discovery endpoints
+
+For AI agents that look up canonical discovery paths before fetching:
+
+- **`llms.txt`** — this file (catalogue summary, capability surface)
+- **`agent.json`** — machine-readable agent capability manifest (name, capabilities, vendor, source-of-truth, version)
+
+**`mcp.json` is intentionally NOT shipped yet.** An `mcp.json` is a contract that tells agents "an MCP server is reachable at this URL with these tools" — and the engine does not yet have an MCP server. Shipping the file with a placeholder URL would cause agents to retry a dead endpoint. When the MCP server ships, `mcp.json` will land in the same commit.
+
+> Standard agent-discovery convention. The `https://raw.githubusercontent.com/r3dz4r/malaysia-data-engine-public/main/<file>` paths are stable as long as the public repo stays public and the `main` branch is the default. The private engine repo (`r3dz4r/malaysia-data-engine`) holds the operator/build artefacts; do not fetch from it directly — most files there are private.
+
+## What agents should NOT do with this catalogue
+
+- **Do not redistribute raw scraped records** without checking the source's declared licence. Most Malaysian government open data is published under Open Government Licence (Malaysia) or Creative Commons Attribution 4.0, but a small subset is paid-access or restricted. The PDPA carve-out applies to the engine's processing boundary, not the user's downstream rights.
+- **Do not ingest the NPRA pharma records into a public LLM training corpus** without negotiating a separate licence. The records are record-merged from NPRA's published approval lists; redistribution rights depend on NPRA's terms.
+- **Do not treat the catalogue as a citation source.** This is forward-compatible infrastructure, not a citation/ranking lever. Agents should cite the upstream publisher (data.gov.my, NPRA, BNM, etc.) when surfacing data, not the engine.
+
+## Source-of-truth hierarchy
+
+The engine has two repositories: the **public documentation surface** (`r3dz4r/malaysia-data-engine-public`, default branch `main`) and the **private engine source** (`r3dz4r/malaysia-data-engine`, default branch `main`). Agents should fetch from the public surface where possible.
+
+1. **`sources.yaml`** — canonical source list (mirrored to the public repo's `main` for agent discovery; canonical in the private engine repo)
+2. **`schemas/<vertical>.yaml`** — per-vertical JSON contracts (mirrored to public `main` when source-code-safe; canonical in the private engine repo)
+3. **`sql/schema.sql`** — generic database schema (private engine repo; surfaced via `openwiki/domain/data-model.md` on the public repo's `main`)
+4. **`data/pharma/health.json`** — NPRA pipeline health (private engine repo; slim summary mirrored to the public repo's `main`)
+5. **`data/pharma/raw/`, `data/pharma/classified/`, `data/pharma/linked/`** — actual record payloads (private engine repo; **not** exposed publicly — these are the resale product)
+
+> The public surface at `r3dz4r/malaysia-data-engine-public` is the agent-discovery surface. The private repo is the operator/build surface. Buyers of the resale product interact via separate channels (AWS Data Exchange listing link forthcoming), not via the agent-discovery endpoints.
+
+## Repository
+
+- **Public discovery surface (this file lives here):** https://github.com/r3dz4r/malaysia-data-engine-public
+- **Engine source code (private):** https://github.com/r3dz4r/malaysia-data-engine
+- **Version:** 0.1.0
+- **Source commit:** `017365e` (2026-08-18)
+- **Maintainer:** Redza Halim
+- **Licence:** Engine source is open source; per-record licence tracks the upstream source's declared terms
+
+## Related infrastructure
+
+- **datapulse.my** — read-only trust layer for the broader Malaysian public data surface (389 datasets, 10-status health taxonomy, MCP endpoint at `mcp.data-pulse.my/mcp`). datapulse.my is the **input trust layer** for the engine's scrapers; the engine is the **curated resale product**. See `docs/alignment-memo-2026-08-16.md` in the engine repo for the formal binding.
+
+---
+
+*Last updated: 2026-08-18 (pharma pipeline daily run). Source commit `017365e`.*

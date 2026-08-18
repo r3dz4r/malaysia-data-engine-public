@@ -1,0 +1,120 @@
+{
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "@id": "https://github.com/r3dz4r/malaysia-data-engine-public#agent",
+    "name": "Malaysia Public Data Intelligence Engine",
+    "alternateName": "malaysia-data-engine",
+    "description": "Reusable, vertical-first pipeline that harvests Malaysian public-sector datasets, normalises each into a source-specific JSON Schema, and stores raw payloads and normalised rows in PostgreSQL for downstream curation and licensed resale. Operational vertical: NPRA pharmaceutical compliance (5 categories, ~31k records refreshed daily). Pending verticals: ePerolehan government procurement, JPPH NAPIC property transactions, SSM company registry.",
+    "url": "https://github.com/r3dz4r/malaysia-data-engine-public",
+    "applicationCategory": "DataPipeline",
+    "applicationSubCategory": "PublicDataIngestion",
+    "operatingSystem": "Linux (Ubuntu 24.04+, systemd-managed timer)",
+    "inLanguage": ["en"],
+    "author": {
+        "@type": "Person",
+        "name": "Redza Halim",
+        "email": "mohd.redzafahmy@gmail.com"
+    },
+    "license": "https://github.com/r3dz4r/malaysia-data-engine-public/blob/main/README.md",
+    "version": "0.1.0",
+    "source_commit_sha": "017365e726605058c841782a5ae31250e4f6b0bc",
+    "source_commit_date": "2026-08-18",
+    "dateModified": "2026-08-18T22:01:00Z",
+    "keywords": [
+        "malaysia",
+        "public-data",
+        "data-pipeline",
+        "data-engineering",
+        "postgresql",
+        "json-schema",
+        "pdpa",
+        "eperolehan",
+        "jpph-napic",
+        "ssm-einfo",
+        "bnm",
+        "opendosm",
+        "data-gov-my",
+        "kkknow",
+        "lhdn-myinvois",
+        "metmalaysia",
+        "mcp-planned",
+        "agent-ready"
+    ],
+    "featureList": [
+        "Reusable fetch→extract→normalise→store contract",
+        "Vertical-agnostic PostgreSQL schema (single entity_record table, JSONB normalized)",
+        "Per-vertical JSON Schema validation (procurement, open_data contracts shipped; property, company_registry pending)",
+        "Content-hash deduplication at the row boundary",
+        "PDPA guardrails: pdpa_risk per source, high-risk sources rejected at runner",
+        "NPRA pharmaceutical compliance pipeline (5 categories, daily refresh, 31,569 records)",
+        "Camofox-driven JS-rendered scraping for ePerolehan",
+        "Agent discovery surfaces: llms.txt, agent.json (mcp.json planned)"
+    ],
+    "data_source_registry": {
+        "@type": "ItemList",
+        "url": "https://raw.githubusercontent.com/r3dz4r/malaysia-data-engine-public/main/sources.yaml",
+        "numberOfItems": 10,
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "ePerolehan (MOF) — Government Procurement", "vertical": "procurement", "refresh_frequency": "daily", "pdpa_risk": "low"},
+            {"@type": "ListItem", "position": 2, "name": "JPPH NAPIC e-Data — Property Transactions", "vertical": "property", "refresh_frequency": "monthly", "pdpa_risk": "low"},
+            {"@type": "ListItem", "position": 3, "name": "SSM e-Info — Company Registry", "vertical": "company_registry", "refresh_frequency": "ad_hoc", "pdpa_risk": "low"},
+            {"@type": "ListItem", "position": 4, "name": "data.gov.my — National Open Data Catalogue", "vertical": "cross_vertical", "refresh_frequency": "daily", "pdpa_risk": "varies"},
+            {"@type": "ListItem", "position": 5, "name": "BNM Open API — Exchange Rates, Rates, Reserves", "vertical": "rates", "refresh_frequency": "daily", "pdpa_risk": "low"},
+            {"@type": "ListItem", "position": 6, "name": "OpenDOSM — Department of Statistics Malaysia", "vertical": "statistics", "refresh_frequency": "varies", "pdpa_risk": "low"},
+            {"@type": "ListItem", "position": 7, "name": "KKMNOW — Ministry of Health", "vertical": "health", "refresh_frequency": "varies", "pdpa_risk": "varies"},
+            {"@type": "ListItem", "position": 8, "name": "LHDN MyInvois — E-invoicing Schema", "vertical": "invoicing", "refresh_frequency": "ad_hoc", "pdpa_risk": "low"},
+            {"@type": "ListItem", "position": 9, "name": "MetMalaysia — Weather API", "vertical": "weather", "refresh_frequency": "varies", "pdpa_risk": "low"},
+            {"@type": "ListItem", "position": 10, "name": "BNM Publications — Reports, Statistics", "vertical": "rates", "refresh_frequency": "varies", "pdpa_risk": "low"}
+        ]
+    },
+    "agent_capability": {
+        "@type": "Thing",
+        "name": "MCP (Model Context Protocol)",
+        "status": "planned",
+        "note": "MCP server is a planned future deliverable. When shipped, will be read-only Streamable HTTP, no auth required, public endpoint. Until shipped, agents use llms.txt + sources.yaml + schemas/<vertical>.yaml for discovery.",
+        "mcp_version_when_shipped": "2025-06-18",
+        "expected_tools_when_shipped": [
+            "search_sources (filter by vertical, refresh_frequency, pdpa_risk)",
+            "get_source (full record by id)",
+            "get_vertical_schema (JSON contract for a vertical)",
+            "get_pharma_health (current NPRA pipeline health snapshot)",
+            "find_fresh_records (records updated within last N hours)"
+        ]
+    },
+    "discovery_endpoints": [
+        {
+            "@type": "DataFeed",
+            "name": "llms.txt",
+            "url": "https://raw.githubusercontent.com/r3dz4r/malaysia-data-engine-public/main/llms.txt",
+            "contentType": "text/plain",
+            "audience": "AI agents, LLM training pipelines, agent builders"
+        },
+        {
+            "@type": "DataFeed",
+            "name": "agent.json",
+            "url": "https://raw.githubusercontent.com/r3dz4r/malaysia-data-engine-public/main/agent.json",
+            "contentType": "application/json",
+            "audience": "AI agents, automated discovery crawlers"
+        },
+        {
+            "@type": "DataFeed",
+            "name": "mcp.json",
+            "url": "https://raw.githubusercontent.com/r3dz4r/malaysia-data-engine-public/main/mcp.json",
+            "contentType": "application/json",
+            "audience": "MCP clients (Claude Desktop, Cursor, Cline)",
+            "status": "planned"
+        },
+        {
+            "@type": "DataFeed",
+            "name": "sources.yaml",
+            "url": "https://raw.githubusercontent.com/r3dz4r/malaysia-data-engine-public/main/sources.yaml",
+            "contentType": "text/yaml",
+            "audience": "Pipeline operators, integration engineers"
+        }
+    ],
+    "honest_framing": {
+        "@type": "Thing",
+        "name": "Operational status",
+        "note": "Engine is scaffold + operational NPRA pharma vertical only. Procurement, JPPH, and SSM scrapers are pending implementation. No MCP server shipped yet. No public SaaS product. This file advertises the catalogue and the future MCP surface so agents can plan discovery paths; it does not overclaim the operational state."
+    }
+}
