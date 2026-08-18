@@ -89,7 +89,7 @@ The engine has two repositories: the **public documentation surface** (`r3dz4r/m
 
 1. **`sources.yaml`** — canonical source list (mirrored to the public repo's `main` for agent discovery; canonical in the private engine repo)
 2. **`schemas/<vertical>.yaml`** — per-vertical JSON contracts (mirrored to public `main` when source-code-safe; canonical in the private engine repo)
-3. **`sql/schema.sql`** — generic database schema (private engine repo; surfaced via `openwiki/domain/data-model.md` on the public repo's `main`)
+3. **`sql/schema.sql`** — generic database schema (private engine repo; documented in `openwiki/domain/data-model.md` once the auto-generated docs surface is rebuilt)
 4. **`data/pharma/health.json`** — NPRA pipeline health (private engine repo; slim summary mirrored to the public repo's `main`)
 5. **`data/pharma/raw/`, `data/pharma/classified/`, `data/pharma/linked/`** — actual record payloads (private engine repo; **not** exposed publicly — these are the resale product)
 

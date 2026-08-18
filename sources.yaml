@@ -1,0 +1,123 @@
+# sources.yaml — Malaysian public data sources (public mirror)
+#
+# Public-facing source catalogue for the Malaysia Data Intelligence Engine.
+# The canonical sources.yaml (with implementation fields like scraper_status
+# and internal notes) lives in the private engine repo. This file is the
+# redacted mirror intended for agent discovery.
+#
+# Fields:
+#   id:                short slug (used as source_id in the DB)
+#   name:              human-readable display name
+#   url:               primary landing page
+#   type:              api | portal | bulk | open_api
+#   refresh_frequency: daily | weekly | monthly | ad_hoc
+#   pdpa_risk:         low | medium | high
+#   pdpa_notes:        why this rating; cite the relevant section of the research brief
+#   licence:           source's own data licence (if any)
+
+- id: eperolehan
+  name: ePerolehan (MOF — Government Procurement)
+  url: https://www.eperolehan.gov.my/quotation-tender-notice
+  type: portal
+  refresh_frequency: daily
+  pdpa_risk: low
+  pdpa_notes: >
+    Procurement tenders publish agency name, role title, and a generic contact
+    email; never personal mobile/email. Outside PDPA's "personal data" definition.
+  licence: Government open data (verify MOF terms before redistribution)
+
+- id: jpph_napic
+  name: JPPH NAPIC e-Data (Property Transactions)
+  url: https://napic.jpph.gov.my/en/application/e-data
+  type: bulk
+  refresh_frequency: monthly
+  pdpa_risk: low
+  pdpa_notes: >
+    Record-level transaction data is published with anonymised parties; no
+    personal identifiers. Outside PDPA. Vertical 2.
+  licence: Paid — RM 4–38 per record (formal application via edatasupport@jpph.gov.my)
+
+- id: ssm_einfo
+  name: SSM e-Info (Suruhanjaya Syarikat Malaysia — Company Registry)
+  url: https://www.ssm.com.my/Pages/Search_Company.aspx
+  type: api
+  refresh_frequency: ad_hoc
+  pdpa_risk: low
+  pdpa_notes: >
+    Business-registry data; no individual director fields exposed by default.
+    Outside PDPA's "personal data" definition. Vertical 3.
+  licence: Government open data (RM 4–38 per company; verify SSM terms before redistribution)
+
+- id: data_gov_my
+  name: data.gov.my (National Open Data Catalogue)
+  url: https://data.gov.my
+  type: portal
+  refresh_frequency: daily
+  pdpa_risk: varies
+  pdpa_notes: >
+    Cross-vertical open-data aggregator. Per-dataset PDPA risk varies; the engine
+    applies the strictest guardrail (low-only) at ingestion.
+  licence: Open Government Licence (Malaysia) for most datasets
+
+- id: bnm_open_api
+  name: Bank Negara Malaysia Open API
+  url: https://apikijang.bnm.gov.my/
+  type: open_api
+  refresh_frequency: daily
+  pdpa_risk: low
+  pdpa_notes: >
+    Exchange rates, policy rates, reserves, interbank rates — all aggregate
+    financial statistics. No personal data.
+  licence: Open Government Licence (Malaysia)
+
+- id: opendosm
+  name: OpenDOSM (Department of Statistics Malaysia)
+  url: https://open.dosm.gov.my/
+  type: open_api
+  refresh_frequency: varies
+  pdpa_risk: low
+  pdpa_notes: >
+    Economic and demographic statistics. Aggregate-level; no personal identifiers.
+  licence: Open Government Licence (Malaysia)
+
+- id: kkmnow
+  name: KKMNOW (Ministry of Health — Health Data)
+  url: https://data.moh.gov.my/
+  type: portal
+  refresh_frequency: varies
+  pdpa_risk: varies
+  pdpa_notes: >
+    Aggregate health statistics by default. Some sub-datasets include counts
+    that could enable re-identification in small regions; engine treats KKMNOW
+    as medium-risk by default and only ingests aggregates.
+  licence: Open Government Licence (Malaysia)
+
+- id: lhdn_myinvois
+  name: LHDN MyInvois (Inland Revenue Board — E-invoicing schema)
+  url: https://myinvois.hasil.gov.my/
+  type: api
+  refresh_frequency: ad_hoc
+  pdpa_risk: low
+  pdpa_notes: >
+    E-invoicing schema and reference data only. No transaction records ingested.
+  licence: Government open data (verify LHDN terms)
+
+- id: metmalaysia
+  name: MetMalaysia Weather API
+  url: https://www.met.gov.my/
+  type: api
+  refresh_frequency: varies
+  pdpa_risk: low
+  pdpa_notes: >
+    Weather observations and forecasts. No personal data.
+  licence: Government open data (verify MetMalaysia terms)
+
+- id: bnm_publications
+  name: BNM publications (Bank Negara Malaysia — Reports, Statistics)
+  url: https://www.bnm.gov.my/publications
+  type: portal
+  refresh_frequency: varies
+  pdpa_risk: low
+  pdpa_notes: >
+    BNM-published reports and statistics PDFs. Aggregate economic data.
+  licence: Open Government Licence (Malaysia)
