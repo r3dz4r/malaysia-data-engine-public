@@ -1,0 +1,184 @@
+{
+  "$schema": "https://mcp.data-pulse.my/engine/mcp.schema.json",
+  "schema": "malaysia-data-engine/v1/mcp-advertisement",
+  "mcp_version": "2026-07-28",
+  "server": {
+    "name": "malaysia-data-engine-mcp",
+    "version": "b2d78f935e26a6b2f800315f439212139b1b6308",
+    "source_commit_sha": "b2d78f935e26a6b2f800315f439212139b1b6308",
+    "description": "Read-only NPRA pharmaceutical records and pipeline health for Malaysia.",
+    "vendor": "Malaysia Data Engine",
+    "repository": "https://github.com/r3dz4r/malaysia-data-engine"
+  },
+  "endpoint": {
+    "url": "https://mcp.data-pulse.my/engine",
+    "transport": "streamable-http",
+    "method": "POST",
+    "auth_required": false
+  },
+  "tools": [
+    {
+      "name": "search_pharma",
+      "description": "Search one NPRA category by its public searchable fields.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "q": {
+            "description": "Case-insensitive substring to search for.",
+            "maxLength": 200,
+            "minLength": 2,
+            "type": "string"
+          },
+          "category": {
+            "default": "products",
+            "enum": [
+              "products",
+              "cancelled",
+              "manufacturers",
+              "importers",
+              "wholesalers"
+            ],
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "q"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_npra_record",
+      "description": "Return one exact NPRA record, searching all categories by default.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "reg_no": {
+            "maxLength": 200,
+            "minLength": 1,
+            "type": "string"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "enum": [
+                  "products",
+                  "cancelled",
+                  "manufacturers",
+                  "importers",
+                  "wholesalers"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "reg_no"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "find_recent_changes",
+      "description": "Return deduplicated changes from the dated pipeline delta artefacts.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "window_days": {
+            "default": 7,
+            "maximum": 30,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "enum": [
+                  "products",
+                  "cancelled",
+                  "manufacturers",
+                  "importers",
+                  "wholesalers"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_pharma_health",
+      "description": "Return the pipeline-produced pharma health document verbatim.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "find_by_manufacturer",
+      "description": "Find products and related NPRA records for a manufacturer-name substring.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "maxLength": 200,
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}
