@@ -4,11 +4,12 @@
   "mcp_version": "2026-07-28",
   "server": {
     "name": "malaysia-data-engine-mcp",
-    "version": "b2d78f935e26a6b2f800315f439212139b1b6308",
-    "source_commit_sha": "b2d78f935e26a6b2f800315f439212139b1b6308",
+    "version": "4ba18c65ed902e08c975fd3a0415dc1278b8cbe2",
+    "source_commit_sha": "pre-push",
+    "source_commit_date": "2026-09-02",
     "description": "Read-only NPRA pharmaceutical records and pipeline health for Malaysia.",
     "vendor": "Malaysia Data Engine",
-    "repository": "https://github.com/r3dz4r/malaysia-data-engine"
+    "repository": "https://github.com/r3dz4r/malaysia-data-engine-public"
   },
   "endpoint": {
     "url": "https://mcp.data-pulse.my/engine",
@@ -31,6 +32,7 @@
           },
           "category": {
             "default": "products",
+            "description": "NPRA category to search. Defaults to products.",
             "enum": [
               "products",
               "cancelled",
@@ -42,6 +44,7 @@
           },
           "limit": {
             "default": 20,
+            "description": "Maximum number of matching products to return. Default 20.",
             "maximum": 100,
             "minimum": 1,
             "type": "integer"
@@ -56,7 +59,7 @@
         "readOnlyHint": true,
         "destructiveHint": false,
         "idempotentHint": true,
-        "openWorldHint": false
+        "openWorldHint": true
       }
     },
     {
@@ -66,6 +69,7 @@
         "additionalProperties": false,
         "properties": {
           "reg_no": {
+            "description": "Exact NPRA registration number to look up (e.g. MAL16100027TCR).",
             "maxLength": 200,
             "minLength": 1,
             "type": "string"
@@ -86,7 +90,8 @@
                 "type": "null"
               }
             ],
-            "default": null
+            "default": null,
+            "description": "Filter the lookup to one NPRA category; defaults to searching all categories."
           }
         },
         "required": [
@@ -98,7 +103,7 @@
         "readOnlyHint": true,
         "destructiveHint": false,
         "idempotentHint": true,
-        "openWorldHint": false
+        "openWorldHint": true
       }
     },
     {
@@ -109,6 +114,7 @@
         "properties": {
           "window_days": {
             "default": 7,
+            "description": "Number of days back to include registry changes. Default 7.",
             "maximum": 30,
             "minimum": 1,
             "type": "integer"
@@ -129,16 +135,18 @@
                 "type": "null"
               }
             ],
-            "default": null
+            "default": null,
+            "description": "Filter changes to one category; all categories by default."
           }
         },
+        "required": [],
         "type": "object"
       },
       "annotations": {
         "readOnlyHint": true,
         "destructiveHint": false,
         "idempotentHint": true,
-        "openWorldHint": false
+        "openWorldHint": true
       }
     },
     {
@@ -147,13 +155,14 @@
       "inputSchema": {
         "additionalProperties": false,
         "properties": {},
+        "required": [],
         "type": "object"
       },
       "annotations": {
         "readOnlyHint": true,
         "destructiveHint": false,
         "idempotentHint": true,
-        "openWorldHint": false
+        "openWorldHint": true
       }
     },
     {
@@ -163,6 +172,7 @@
         "additionalProperties": false,
         "properties": {
           "name": {
+            "description": "Manufacturer-name substring to search for (case-insensitive).",
             "maxLength": 200,
             "minLength": 2,
             "type": "string"
@@ -177,7 +187,23 @@
         "readOnlyHint": true,
         "destructiveHint": false,
         "idempotentHint": true,
-        "openWorldHint": false
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "verify_pharma_artifact",
+      "description": "Return the public verification stub for the signed pharma provenance bundle.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {},
+        "required": [],
+        "type": "object"
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
       }
     }
   ]

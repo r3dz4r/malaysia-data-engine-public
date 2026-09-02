@@ -52,19 +52,32 @@ against the canonical source-of-truth before relying on any record.
 
 ## Model Context Protocol (MCP)
 
-**Status: planned, not yet shipped.** The engine's MCP server is a future
-deliverable. When shipped, it will be:
+**Status: shipped (read-only).** The engine's MCP server is a sanitised,
+runnable implementation over the `public_sample/` data layer. It is:
 
-- **Read-only** — agents query the catalogue; nothing is written upstream
+- **Read-only** — agents query the sample; nothing is written upstream
 - **Public, no auth required** — same posture as datapulse-my's MCP endpoint
 - **Streamable HTTP transport** — POST-only, single endpoint
 
-Until the MCP server ships, agents can:
+Six read-only tools are advertised in `mcp.json`, each carrying four explicit
+boolean annotations (`readOnlyHint`, `destructiveHint`, `idempotentHint`,
+`openWorldHint`):
 
-1. Fetch this `llms.txt` for the catalogue summary
-2. Fetch `https://raw.githubusercontent.com/r3dz4r/malaysia-data-engine-public/main/sources.yaml` for the canonical source list (mirrored from the private engine repo)
-3. Fetch `https://raw.githubusercontent.com/r3dz4r/malaysia-data-engine-public/main/schemas/<vertical>.yaml` for any specific vertical's JSON contract (mirrored where source-code-safe)
-4. Fetch `https://raw.githubusercontent.com/r3dz4r/malaysia-data-engine-public/main/data/pharma/health.json` for the NPRA pipeline health snapshot (mirrored as a slim summary; full health.json lives in the private repo)
+- `search_pharma` — search one NPRA category by public searchable fields
+- `get_npra_record` — one exact NPRA record by registration number
+- `find_recent_changes` — deduplicated changes from dated delta artefacts
+- `get_pharma_health` — the pipeline health document verbatim
+- `find_by_manufacturer` — products and related records for a manufacturer name
+- `verify_pharma_artifact` — public stub returning a stable verification hint
+
+Run the server locally against the sample data:
+
+```bash
+ENGINE_DATA_ROOT=public_sample python -m engine.mcp.server
+```
+
+The server reads only `public_sample/`; it never touches the private classified
+data, secrets, or deployment paths.
 
 ## Agent discovery endpoints
 
@@ -72,8 +85,7 @@ For AI agents that look up canonical discovery paths before fetching:
 
 - **`llms.txt`** — this file (catalogue summary, capability surface)
 - **`agent.json`** — machine-readable agent capability manifest (name, capabilities, vendor, source-of-truth, version)
-
-**`mcp.json` is intentionally NOT shipped yet.** An `mcp.json` is a contract that tells agents "an MCP server is reachable at this URL with these tools" — and the engine does not yet have an MCP server. Shipping the file with a placeholder URL would cause agents to retry a dead endpoint. When the MCP server ships, `mcp.json` will land in the same commit.
+- **`mcp.json`** — MCP advertisement (six read-only tools, full annotations)
 
 > Standard agent-discovery convention. The `https://raw.githubusercontent.com/r3dz4r/malaysia-data-engine-public/main/<file>` paths are stable as long as the public repo stays public and the `main` branch is the default. The private engine repo (`r3dz4r/malaysia-data-engine`) holds the operator/build artefacts; do not fetch from it directly — most files there are private.
 

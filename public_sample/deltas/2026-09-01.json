@@ -1,0 +1,28 @@
+{
+  "run_date": "2026-09-01",
+  "sources": {
+    "products": {
+      "new": [
+        {
+          "reg_no": "MAL20212345K",
+          "product": "Loratadine 10mg Tablet",
+          "manufacturer": "Apex Healthcare"
+        }
+      ],
+      "removed": [],
+      "field_changed": [
+        {
+          "reg_no": "MAL19964378X",
+          "field": "holder"
+        }
+      ],
+      "status_changed": [
+        {
+          "reg_no": "MAL20000222Z",
+          "from": "active",
+          "to": "cancelled"
+        }
+      ]
+    }
+  }
+}
