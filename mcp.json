@@ -5,7 +5,7 @@
   "server": {
     "name": "malaysia-data-engine-mcp",
     "version": "4ba18c65ed902e08c975fd3a0415dc1278b8cbe2",
-    "source_commit_sha": "pre-push",
+    "source_commit_sha": "40d5725158338d667090d00fe76a6eef1c870959",
     "source_commit_date": "2026-09-02",
     "description": "Read-only NPRA pharmaceutical records and pipeline health for Malaysia.",
     "vendor": "Malaysia Data Engine",
